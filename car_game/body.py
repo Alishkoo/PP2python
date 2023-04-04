@@ -20,7 +20,7 @@ def main():
 
     #создаем таймер когда будут создаваться машинки
     enemy_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(enemy_timer, 1500)
+    pygame.time.set_timer(enemy_timer, 1000)
 
 
     #player car
@@ -31,7 +31,7 @@ def main():
     
     
     #enemy cars
-    enemy_pos_list = [90, 160, 230, 290]
+    enemy_pos_list = [90, 120, 160, 180, 230, 240, 250, 290]
     # enemy_x = enemy_pos_list[randint(0, 3)] # 80, 150, 220 , 280
     enemy_x = 90
     enemy_y = -20
@@ -55,9 +55,9 @@ def main():
 
             
             #рандомно задаю значения для позиции противников
-            enemy_x = enemy_pos_list[randint(0, 3)]
+            enemy_x = enemy_pos_list[randint(0, 7)]
             #ускорение машин с временем
-            enemy_speed += 0.05
+            enemy_speed += 0.04
             
             #обработка нажатий 
             keys = pygame.key.get_pressed()
