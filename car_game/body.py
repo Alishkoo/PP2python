@@ -7,10 +7,20 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((434, 626))
     bg = pygame.image.load("D:/PP2python/car_game/images/background.png").convert_alpha()
+    end = pygame.image.load("D:\PP2python\car_game\images\end.png").convert_alpha()
+    
+    
+    
+    #создаем кнопки yes or no 
+    myfont = pygame.font.Font("D:/PP2python/car_game/fonts/Roboto-Medium.ttf", 40)
+    text_no = myfont.render("No", False, (193, 196, 192))
+    text_yes = myfont.render("Yes", False, (193, 196, 192))
+    text_no_rect = text_no.get_rect(topleft=(190, 370))
+    text_yes_rect = text_yes.get_rect(topleft=(190, 290))
 
     #создаем таймер когда будут создаваться машинки
     enemy_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(enemy_timer, 2500)
+    pygame.time.set_timer(enemy_timer, 1500)
 
 
     #player car
@@ -21,56 +31,86 @@ def main():
     
     
     #enemy cars
-    enemy_pos_list = [80, 150, 220, 280]
+    enemy_pos_list = [90, 160, 230, 290]
     # enemy_x = enemy_pos_list[randint(0, 3)] # 80, 150, 220 , 280
-    enemy_x = 80
+    enemy_x = 90
     enemy_y = -20
     car_enemy = pygame.transform.rotate(pygame.image.load("D:/PP2python/car_game/images/car.png").convert_alpha(), 180)
     car_enemy_rect = car_enemy.get_rect(topleft=(enemy_x, enemy_y))
-
+    enemy_speed = 0.5
     enemy_list = []
 
     bg_y = 0
+    starttime = 0
 
     gameplay = True
-    while gameplay:
-        #рандомно задаю значения для позиции противников
-        enemy_x = enemy_pos_list[randint(0, 3)]
-
-        #обработка нажатий 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_a] and player_x >= 70:
-            player_x -= 5
-        elif keys[pygame.K_d] and player_x <= 300:
-            player_x += 5
-
-
-        #создаю для фигуру игрока для обработки его
-        car_player_rect = car_player.get_rect(topleft=(player_x, player_y))
-
-
-        #анимация экрана
-        screen.blit(bg, (0, bg_y))
-        screen.blit(bg, (0, bg_y - 626))
-        bg_y += 5
-        if bg_y >= 626:
-            bg_y = 0
+    while True:
         
-        #вывод машины игрока
-        screen.blit(car_player, (player_x, player_y))
+        if gameplay:
+            #секундомер для игры 
+            ticks=pygame.time.get_ticks() - starttime
+            millis=ticks%1000
+            seconds=int(ticks/1000 % 60)
+            text_seconds = myfont.render(f"{seconds}", True, 'dodgerblue')
 
-        # вывод противников 
-        if enemy_list:
-            for (i, el) in enumerate(enemy_list):
-                screen.blit(car_enemy, el)
-                el.y += 10
-                # print(el.x, el.y)
-                print(player_x, player_y)
-                if el.y >= 630:
-                    enemy_list.pop(i)
+            
+            #рандомно задаю значения для позиции противников
+            enemy_x = enemy_pos_list[randint(0, 3)]
+            #ускорение машин с временем
+            enemy_speed += 0.05
+            
+            #обработка нажатий 
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_a] and player_x >= 85:
+                player_x -= 10
+            elif keys[pygame.K_d] and player_x <= 310:
+                player_x += 10
+
+
+            #создаю для фигуру игрока для обработки его
+            car_player_rect = car_player.get_rect(topleft=(player_x, player_y))
+
+
+            #анимация экрана
+            screen.blit(bg, (0, bg_y))
+            screen.blit(bg, (0, bg_y - 626))
+            bg_y += 5
+            if bg_y >= 626:
+                bg_y = 0
                 
-                if car_player_rect.colliderect(el):
-                    print("game over")
+            #вывод секунд
+            screen.blit(text_seconds, (0, 0))
+            
+            #вывод машины игрока
+            screen.blit(car_player, (player_x, player_y))
+
+            # вывод противников 
+            if enemy_list:
+                for (i, el) in enumerate(enemy_list):
+                    screen.blit(car_enemy, el)
+                    el.y += (enemy_speed + 10)
+                    # print(el.x, el.y)
+                    # print(player_x, player_y)
+                    if el.y >= 630:
+                        enemy_list.pop(i)
+                    
+                    if car_player_rect.colliderect(el):
+                        gameplay = False
+        else:
+            screen.fill((0, 0, 0))
+            screen.blit(end, (-80, 170))    
+            
+            mouse = pygame.mouse.get_pos()
+            if text_yes_rect.collidepoint(mouse) and pygame.mouse.get_pressed()[0]: 
+                gameplay = True
+                enemy_list.clear()
+                player_x = 200
+                player_y = 500
+                enemy_speed = 0.5
+                starttime = ticks
+                
+            if text_no_rect.collidepoint(mouse) and pygame.mouse.get_pressed()[0]:
+                sys.exit()        
                     
 
                 
