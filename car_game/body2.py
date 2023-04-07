@@ -28,20 +28,7 @@ def main():
     player_y = 500
     car_player = pygame.transform.rotate(pygame.image.load("D:/PP2python/car_game/images/third.png").convert_alpha(), 180)
     # car_player_rect = car_player.get_rect(topleft=(player_x, player_y))
-
-    #создаем другой таймер для монеток
-    coin_timer = pygame.USEREVENT + 1
-    pygame.time.set_timer(coin_timer, 2000)
-
-    #создаем монетку
-    coin_amount = 0
-    coin_x = 290
-    coin_y = 50
-    coin_x_list = [90, 160, 230, 290]
-    coin_y_list = [200, 100, 50, 150]
-    coin = pygame.image.load("D:\PP2python\car_game\images\money.png").convert_alpha()
-    coin_rect = coin.get_rect(topleft=(coin_x, coin_y))
-    coin_list = []
+    
     
     #enemy cars
     enemy_pos_list = [90, 120, 160, 180, 230, 240, 250, 290]
@@ -75,11 +62,10 @@ def main():
             
             #рандомно задаю значения для позиции противников
             random_pos = randint(0, 7)
-            #random_image = randint(0, 3)
-            #монетки
-            coin_x = coin_x_list[randint(0, 3)]
-            coin_y = coin_y_list[randint(0, 3)]
+            random_image = randint(0, 3)
             enemy_x = enemy_pos_list[random_pos]
+            #ускорение машин с временем
+            enemy_speed += 0.04
             
             #обработка нажатий 
             keys = pygame.key.get_pressed()
@@ -101,40 +87,23 @@ def main():
                 bg_y = 0
                 
             #вывод секунд
-            #screen.blit(text_seconds, (0, 0))
-            
-            #вывод количества монеток
-            text_coin = myfont.render(f"{coin_amount}", True, (255, 233, 0))
-            screen.blit(text_coin, (395, 10))
+            screen.blit(text_seconds, (0, 0))
             
             #вывод машины игрока
             screen.blit(car_player, (player_x, player_y))
 
-            #вывод монеток
-            if coin_list:
-                for (i, el) in enumerate(coin_list):
-                    screen.blit(coin, el)
-                    el.y += 5
-                    
-                    if el.y >= 630:
-                        coin_list.pop(i)
-            
-                    if car_player_rect.colliderect(el):
-                        coin_amount += 1
-                        coin_list.pop(i)
-                        
-                        
             # вывод противников 
             if enemy_list:
                 for (i, el) in enumerate(enemy_list):
-                    screen.blit(car_image_list[1], el)
-                    el.y += (enemy_speed + 10)
+                    screen.blit(el, (enemy_x, enemy_y))
+                    enemy_cars = el.get_rect(topleft=(enemy_x, enemy_y))
+                    enemy_cars.y += (enemy_speed + 10)
                     # print(el.x, el.y)
                     # print(player_x, player_y)
-                    if el.y >= 630:
+                    if enemy_cars.y >= 630:
                         enemy_list.pop(i)
                     
-                    if car_player_rect.colliderect(el):
+                    if car_player_rect.colliderect(enemy_cars):
                         gameplay = False
         else:
             screen.fill((0, 0, 0))
@@ -148,8 +117,6 @@ def main():
                 player_y = 500
                 enemy_speed = 0.5
                 starttime = ticks
-                coin_list.clear()
-                coin_amount = 0
                 
             if text_no_rect.collidepoint(mouse) and pygame.mouse.get_pressed()[0]:
                 sys.exit()        
@@ -162,15 +129,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-            #добавление монеток
-            if event.type == coin_timer:
-                coin_list.append(coin.get_rect(topleft=(coin_x, coin_y)))
-            #добавление противников
             if event.type == enemy_timer:
-                enemy_list.append(car_image_list[0].get_rect(topleft=(enemy_x, enemy_y)))
-            #ускорение машин с временем
-            if event.type == enemy_timer:
-                enemy_speed += 2
+                enemy_list.append(car_image_list[random_image])
 
 
 
